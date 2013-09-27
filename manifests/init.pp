@@ -35,7 +35,30 @@
 #
 # Copyright 2013 Your name here, unless otherwise noted.
 #
-class teamcity_agent {
+class teamcity_agent(
 
+  $user        = $teamcity_agent::params::user,
+  $service     = $teamcity_agent::params::service,
+
+  $server_url  = $teamcity_agent::params::server_url,
+  $agent_name  = $teamcity_agent::params::agent_name,
+  $own_address = $teamcity_agent::params::own_address,
+  $own_port    = $teamcity_agent::params::own_port,
+  $properties  = $teamcity_agent::params::properties,
+
+  $wget        = $teamcity_agent::params::wget,
+  $unzip       = $teamcity_agent::params::unzip,
+
+) {
+
+  include '::teamcity_agent::requirements'
+  include '::teamcity_agent::install'
+  include '::teamcity_agent::config'
+  include '::teamcity_agent::service'
+
+  Class['::teamcity_agent::requirements'] ->
+    Class['::teamcity_agent::install'] ->
+    Class['::teamcity_agent::config'] ->
+    Class['::teamcity_agent::service']
 
 }
