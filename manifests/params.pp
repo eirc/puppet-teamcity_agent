@@ -7,7 +7,7 @@ class teamcity_agent::params {
   $agent_name  = $hostname
   $own_address = 'localhost'
   $own_port    = '9090'
-  $properties  = ''
+  $properties  = { }
 
   $wget        = '/usr/bin/wget'
   $unzip       = '/usr/bin/unzip'

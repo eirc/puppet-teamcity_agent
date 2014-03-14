@@ -1,10 +1,39 @@
 class teamcity_agent::config inherits teamcity_agent {
 
-  file { "/home/${user}/buildAgent/conf/buildAgent.properties":
+  $propfile = "/home/${user}/buildAgent/conf/buildAgent.properties"
+
+  # Install the default unconfigured configuration file if missing
+  file { $propfile:
     ensure  => 'present',
     replace => 'no',
-    content => template('teamcity_agent/buildAgent.properties.erb'),
+    source  => 'puppet:///modules/teamcity_agent/buildAgent.properties',
     owner   => $user,
+  }
+
+  # Have the latest properties augeas lens available for configuring properties files
+  $lens = '/usr/share/augeas/lenses/propertieslatest.aug'
+  file { $lens:
+    ensure => file,
+    source => 'puppet:///modules/teamcity_agent/propertieslatest.aug',
+  }
+
+  augeas { $propfile:
+    lens    => "propertieslatest.lns",
+    incl    => $propfile,
+    changes => [
+      "set serverUrl ${server_url}",
+      "set name ${agent_name}",
+      "set ownAddress ${own_address}",
+      "set ownPort ${own_port}"
+    ],
+    require => [ File[$propfile], File[$lens] ],
+  }
+
+  augeas { "${propfile}-custom-properties":
+    lens    => "propertieslatest.lns",
+    incl    => $propfile,
+    changes => suffix(prefix(join_keys_to_values($properties, ' "'), 'set '), '"'),
+    require => [ File[$propfile], File[$lens] ],
   }
 
   file { "/home/${user}/buildAgent/bin/agent.sh":
