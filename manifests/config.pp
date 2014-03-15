@@ -29,6 +29,8 @@ class teamcity_agent::config inherits teamcity_agent {
     require => [ File[$propfile], File[$lens] ],
   }
 
+  # This is possibly a better way to convert the $properties hash to "set property value" strings for augeas:
+  # https://groups.google.com/forum/#!topic/puppet-users/e4B9V8u-YZw
   augeas { "${propfile}-custom-properties":
     lens    => "propertieslatest.lns",
     incl    => $propfile,
